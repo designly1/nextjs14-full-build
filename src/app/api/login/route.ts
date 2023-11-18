@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 
-import { getJwtSecretKey } from '@/app/lib/server/auth';
+import { getJwtSecretKey } from '@/lib/server/auth';
+
+import { UserData, UserDataPublic } from '@/types/UserData.type';
 
 export interface I_ApiUserLoginRequest {
 	login: string;
@@ -10,13 +12,14 @@ export interface I_ApiUserLoginRequest {
 
 export interface I_ApiUserLoginResponse {
 	success: boolean;
+	userData?: UserData;
 	message?: string;
 }
 
 export const dynamic = 'force-dynamic';
-export const jwtExpires = 60 * 60 * 24 * 7; // 7 days
+const jwtExpires = 60 * 60 * 24 * 7; // 7 days
 
-const userData = {
+const userData: UserData = {
 	id: 1,
 	firstName: 'John',
 	lastName: 'Doe',
@@ -49,6 +52,9 @@ export async function POST(request: Request) {
 			if (!userData) {
 				throw new Error('User not found');
 			}
+			if (userData.email !== login) {
+				throw new Error('Invalid login');
+			}
 			if (userData.password !== password) {
 				throw new Error('Invalid password');
 			}
@@ -73,6 +79,7 @@ export async function POST(request: Request) {
 			lastName: userData.lastName,
 			email: userData.email,
 			phone: userData.phone,
+			password: userData.password,
 			role: userData.role,
 		})
 			.setProtectedHeader({ alg: 'HS256' })
@@ -82,13 +89,32 @@ export async function POST(request: Request) {
 
 		const res: I_ApiUserLoginResponse = {
 			success: true,
+			userData,
 		};
 
 		const response = NextResponse.json(res);
 
+		// Set encoded token as cookie
 		response.cookies.set({
 			name: 'token',
 			value: token,
+			path: '/',
+		});
+
+		// Create public user data
+		const userDataPublic: UserDataPublic = {
+			id: userData.id,
+			firstName: userData.firstName,
+			lastName: userData.lastName,
+			email: userData.email,
+			phone: userData.phone,
+			role: userData.role,
+		};
+
+		// Set public user data as cookie
+		response.cookies.set({
+			name: 'userData',
+			value: JSON.stringify(userDataPublic),
 			path: '/',
 		});
 

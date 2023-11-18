@@ -1,14 +1,15 @@
 'use client';
 import React, { useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 
-import { useRouter } from 'nextjs13-progress';
+import { useSearchParams } from 'next/navigation';
+import { useApp } from '@/contexts/AppContext';
 
 import { I_ApiUserLoginRequest, I_ApiUserLoginResponse } from '../api/login/route';
 
 export default function LoginPage() {
+	const { userData, setUserData } = useApp();
+
 	// Utils
-	const router = useRouter();
 	const searchParams = useSearchParams();
 	const redirect = searchParams.get('redirect');
 
@@ -26,7 +27,7 @@ export default function LoginPage() {
 		if (isLoading) return;
 
 		setIsLoading(true);
-        setError('');
+		setError('');
 		try {
 			if (!loginRef.current?.value || !passwordRef.current?.value)
 				throw new Error('Please enter your credentials.');
@@ -49,9 +50,9 @@ export default function LoginPage() {
 			if (data.success) {
 				setLoginIsComplete(true);
 				if (redirect) {
-					router.push(redirect);
+					window.location.replace(redirect);
 				} else {
-					router.push('/dashboard');
+					window.location.replace('/dashboard');
 				}
 				return;
 			}
@@ -86,6 +87,7 @@ export default function LoginPage() {
 							<span className="label-text">Login</span>
 						</label>
 						<input
+							defaultValue="john@example.com"
 							type="text"
 							ref={loginRef}
 							className="input input-bordered"
@@ -103,6 +105,7 @@ export default function LoginPage() {
 							<span className="label-text">Password</span>
 						</label>
 						<input
+							defaultValue="12345"
 							type="password"
 							ref={passwordRef}
 							className="input input-bordered"

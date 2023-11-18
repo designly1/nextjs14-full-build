@@ -3,9 +3,11 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Next13NProgress } from 'nextjs13-progress';
 
-const inter = Inter({ subsets: ['latin'] });
-
 import LayoutWrapper from './LayoutWrapper';
+
+import { cookies } from 'next/headers';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -13,10 +15,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+	const cookieStore = cookies();
+	const token = cookieStore.get('token');
+
 	return (
 		<html lang="en">
 			<body className={inter.className}>
-				<LayoutWrapper>{children}</LayoutWrapper>
+				<main className="flex flex-col min-h-screen bg-zinc-950 text-white">
+					<LayoutWrapper token={token}>{children}</LayoutWrapper>
+				</main>
 				<Next13NProgress
 					color="blue"
 					height={7}

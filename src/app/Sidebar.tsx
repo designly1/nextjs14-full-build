@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'nextjs13-progress';
 
+import { useApp } from '@/contexts/AppContext';
+
 interface Props {
 	showSidebar: boolean;
 	setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -8,6 +10,9 @@ interface Props {
 
 export default function Sidebar(props: Props) {
 	const { showSidebar, setShowSidebar } = props;
+	const { userData } = useApp();
+
+	const isLoggedIn = userData !== null;
 
 	const handleClick = () => {
 		setShowSidebar(false);
@@ -32,10 +37,10 @@ export default function Sidebar(props: Props) {
 					Settings
 				</Link>
 				<Link
-					href="/"
+					href={isLoggedIn ? '/logout' : '/login'}
 					onClick={handleClick}
 				>
-					Logout
+					{isLoggedIn ? 'Logout' : 'Login'}
 				</Link>
 			</div>
 			{showSidebar ? (

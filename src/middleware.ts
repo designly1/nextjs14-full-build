@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
-import { verifyJwtToken } from './app/lib/server/auth';
+import { verifyJwtToken } from './lib/server/auth';
 
 const authRoutes = ['/dashboard/*', '/api/me/*'];
 
